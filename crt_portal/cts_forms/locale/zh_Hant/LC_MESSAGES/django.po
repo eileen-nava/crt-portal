@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-13 18:44+0000\n"
+"POT-Creation-Date: 2021-10-25 14:45+0000\n"
 "Language: Chinese Traditional\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1659,8 +1659,8 @@ msgid ""
 "status, sex, religion, familial status, or loss of other constitutional "
 "rights."
 msgstr ""
-"民權司負責執行聯邦法律，保護您免於因為種族、膚色、原國籍、殘障人士身分、性"
-"別、宗教、家庭狀況而遭受歧視或喪失其他憲法權利。"
+"民權司負責執行聯邦法律，保護您免於因為種族、膚色、國籍、殘障人士身分、性別、"
+"宗教、家庭狀況而遭受歧視或喪失其他憲法權利。"
 
 #: templates/landing.html:89
 msgid ""
@@ -1775,7 +1775,7 @@ msgstr ""
 "如果您曾經遭受執法人員（包括在遭到監禁期間）的<span class=\"crt-landing--"
 "rights_categories\">不當對待</span>、您認為自己曾是<span class=\"crt-"
 "landing--rights_categories\">仇恨犯罪</span>或<span class=\"crt-landing--"
-"rights_categories\">人口販賣</span>的受害者，我們可以協助您與適當的單位聯絡。"
+"rights_categories\">人口販運</span>的受害者，我們可以協助您與適當的單位聯絡。"
 
 #: templates/landing.html:187
 msgid "Choose from this list to see example civil rights violations:"
