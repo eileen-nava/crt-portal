@@ -1,3 +1,10 @@
-<option value="{{option.value}}" {% if option.selected is not False %}selected{% endif %}>
-  {{option.label|default:option.value}}
-</option>
+{% load get_dict_item %}
+<option
+  value="{{ option.value }}"
+  {% if option_aria_labels and option_aria_labels|get_dict_item:option.value %}
+    aria-label="{{ option_aria_labels|get_dict_item:option.value }}"
+  {% endif %}
+  {% if option.selected is not False %}
+    selected
+  {% endif %}
+>{{ option.label|default:option.value }}</option>

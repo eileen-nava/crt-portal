@@ -22,6 +22,7 @@ from .model_variables import (COMMERCIAL_OR_PUBLIC_ERROR,
                               CORRECTIONAL_FACILITY_LOCATION_CHOICES,
                               CORRECTIONAL_FACILITY_LOCATION_TYPE_CHOICES,
                               DATE_ERRORS, DISTRICT_CHOICES,
+                              DISTRICT_CHOICES_ARIA_LABELS,
                               EMPLOYER_SIZE_CHOICES, EMPLOYER_SIZE_ERROR,
                               EMPTY_CHOICE, INCIDENT_DATE_HELPTEXT,
                               INTAKE_FORMAT_CHOICES,
@@ -1268,6 +1269,7 @@ class ComplaintActions(ModelForm, ActivityStreamUpdater):
         self.fields['district'] = ChoiceField(
             widget=ComplaintSelect(
                 label='Judicial district',
+                option_aria_labels=DISTRICT_CHOICES_ARIA_LABELS,
                 attrs={
                     'class': 'crt-dropdown__data',
                 },
@@ -1420,6 +1422,7 @@ class BulkActionsForm(Form, ActivityStreamUpdater):
                 'class': 'crt-dropdown__data',
                 'disabled': 'disabled'
             },
+            option_aria_labels=DISTRICT_CHOICES_ARIA_LABELS,
         ),
         choices=_add_empty_choice(DISTRICT_CHOICES, default_string=EMPTY_CHOICE),
         required=False

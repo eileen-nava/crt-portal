@@ -21,17 +21,26 @@ class ComplaintSelect(ChoiceWidget):
 
     def __init__(self, *args, **kwargs):
         label = kwargs.pop('label', None)
+        option_aria_labels = kwargs.pop('option_aria_labels', None)
 
         ChoiceWidget.__init__(self, *args, **kwargs)
 
         self.label = label
+        self.option_aria_labels = option_aria_labels
 
-    def label_for_widget(self):
+    def get_label_for_widget(self):
         return self.label
+
+    def get_option_aria_labels(self):
+        try:
+            return dict(self.option_aria_labels)
+        except:
+            return {}
 
     def render(self, name, value, attrs=None, renderer=None):
         extra_context = {
-            'label': self.label_for_widget()
+            'label': self.get_label_for_widget(),
+            'option_aria_labels': self.get_option_aria_labels(),
         }
         context = self.get_context(name, value, attrs)
         context.update(extra_context)
