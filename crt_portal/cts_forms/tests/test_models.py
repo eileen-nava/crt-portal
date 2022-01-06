@@ -1,6 +1,8 @@
 """
 Testing multilingual properties used to make messages
 """
+from datetime import datetime
+
 from django.test import SimpleTestCase
 
 from .factories import ReportFactory
@@ -42,3 +44,8 @@ class ReportSimpleTests(SimpleTestCase):
         report = ReportFactory.build(contact_last_name="", contact_first_name="")
         expected = "Thank you for your report"
         self.assertEqual(report.addressee, expected)
+
+    def test_crt_address(self):
+        report = ReportFactory.build(crt_reciept_day=1, crt_reciept_month=1, crt_reciept_year=2000)
+        expected = datetime(2000, 1, 1, 0, 0)
+        self.assertEqual(report.crt_reciept_date, expected)
