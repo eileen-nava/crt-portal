@@ -36,7 +36,7 @@ from .forms import (
 )
 from .mail import crt_send_mail
 from .model_variables import HATE_CRIMES_TRAFFICKING_MODEL_CHOICES
-from .models import CommentAndSummary, Profile, Report, ReportAttachment, Trends, EmailReportCount, User
+from .models import CommentAndSummary, Profile, Report, ReportAttachment, Trends, User
 from .page_through import pagination
 from .sorts import report_sort
 
@@ -67,8 +67,6 @@ def reconstruct_query(next_qp):
     """
     querydict = QueryDict(next_qp)
     report_query, _ = report_filter(querydict)
-
-    report_query = report_query.annotate(email_count=F('email_report_count__email_count'))
 
     sort_expr, sorts = report_sort(querydict)
     report_query = report_query.order_by(*sort_expr)
@@ -177,13 +175,11 @@ def index_view(request):
     per_page = request.GET.get('per_page', 15)
     page = request.GET.get('page', 1)
 
-    requested_reports = report_query.annotate(email_count=F('email_report_count__email_count'))
-
     sort_expr, sorts = report_sort(request.GET)
-    requested_reports = requested_reports.order_by(*sort_expr)
+    report_query = report_query.order_by(*sort_expr)
 
-    paginator = Paginator(requested_reports, per_page)
-    requested_reports, page_format = pagination(paginator, page, per_page)
+    paginator = Paginator(report_query, per_page)
+    report_query, page_format = pagination(paginator, page, per_page)
 
     sort_state = {}
     # make sure the links for this page have the same paging, sorting, filtering etc.
@@ -213,7 +209,7 @@ def index_view(request):
     data = []
 
     paginated_offset = page_format['page_range_start'] - 1
-    for index, report in enumerate(requested_reports):
+    for index, report in enumerate(report_query):
         p_class_list = format_protected_class(
             report.protected_class.all().order_by('form_order'),
             report.other_class,
@@ -484,8 +480,6 @@ class ShowView(LoginRequiredMixin, View):
                     add_activity(request.user, "District:", description, report)
 
             report.save()
-            if 'contact_email' in form.changed_data:
-                EmailReportCount.refresh_view()
             form.update_activity_stream(request.user)
             messages.add_message(request, messages.SUCCESS, form.success_message())
 
@@ -790,7 +784,6 @@ class ProFormView(LoginRequiredMixin, SessionWizardView):
 
     def done(self, form_list, form_dict, **kwargs):
         data, report = save_form(self.get_all_cleaned_data())
-        EmailReportCount.refresh_view()
         return redirect(reverse('crt_forms:crt-forms-show', kwargs={'id': report.pk}))
 
 

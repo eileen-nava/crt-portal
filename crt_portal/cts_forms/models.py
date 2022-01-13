@@ -5,7 +5,7 @@ from datetime import datetime
 from babel.dates import format_date
 
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.indexes import Index, GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxValueValidator, RegexValidator
 from django.db import connection, models
@@ -198,6 +198,8 @@ class Report(models.Model):
     closed_date = models.DateTimeField(blank=True, null=True, help_text="The Date this report's status was most recently set to \"Closed\"")
     language = models.CharField(default='en', max_length=10, blank=True, null=True)
     opened = models.BooleanField(default=False)
+    # number of emails, updated as data is added or change
+    email_count = models.PositiveIntegerField(blank=True, null=True)
 
     # Not in use- but need to preserving historical data
     hatecrimes_trafficking = models.ManyToManyField(HateCrimesandTrafficking, blank=True)
@@ -209,8 +211,17 @@ class Report(models.Model):
     violation_summary_search_vector = SearchVectorField(null=True, editable=False)
 
     class Meta:
-        indexes = [GinIndex(fields=['violation_summary_search_vector'])]
+        indexes = [
+            GinIndex(fields=['violation_summary_search_vector']),
+            # default to btree index for columns that are available for order by on the view all form
+            # These were the main sort fields
+            # Added ordering for create date, since that is the default order coming to that page
+            Index(fields=[
+                '-create_date', 'email_count', 'assigned_to', 'location_name',
+            ]),
+        ]
 
+    # This might need be a regular, indexed field
     @cached_property
     def last_incident_date(self):
         try:
@@ -430,26 +441,6 @@ class ReportAttachment(models.Model):
 
     def get_absolute_url(self):
         return reverse('crt_forms:get-report-attachment', kwargs={"id": self.report.id, "attachment_id": self.id})
-
-
-class EmailReportCount(models.Model):
-    """see the total number of reports that are associated with the contact_email for each report"""
-    report = models.OneToOneField(Report, primary_key=True, on_delete=models.CASCADE, related_name='email_report_count')
-    email_count = models.IntegerField()
-
-    class Meta:
-        """This model is tied to a view created from migration 93"""
-        managed = False
-        db_table = 'email_report_count'
-
-    @staticmethod
-    def refresh_view():
-        start = time.time()
-        with connection.cursor() as cursor:
-            cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY email_report_count;")
-        end = time.time()
-        elapsed = round(end - start, 4)
-        logger.info(f'SUCCESS: Refreshed Email view in {elapsed} seconds')
 
 
 class Trends(models.Model):
